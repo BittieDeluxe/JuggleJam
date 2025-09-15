@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
         body = GetComponent<Rigidbody2D>();
         if (body == null)
         {
-            Debug.LogError("Rigidbody2D component is missing from the bird GameObject.");
+            Debug.LogError("Rigidbody2D component is missing from the soccer ball GameObject.");
         }
     }
 
@@ -19,11 +19,14 @@ public class PlayerController : MonoBehaviour
     {
         if (GameManager.isPlaying && (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space)))
         {
-            // Apply force only if the bird is moving downwards (prevents excessive jumping when holding the mouse button)
+            // Apply force only if the ball is moving downwards (prevents excessive jumping when holding the mouse button)
             if (body.linearVelocity.y <= 0)
             {
                 body.linearVelocity = Vector2.zero;  // Reset the velocity to have consistent force application
                 body.AddForce(Vector2.up * forceValue, ForceMode2D.Impulse);
+
+                // Increment score for each successful juggle
+                GameManager.IncrementScore();
             }
         }
 
@@ -33,17 +36,25 @@ public class PlayerController : MonoBehaviour
             body.linearVelocity = new Vector2(body.linearVelocity.x, maxVerticalVelocity);
         }
 
-        // Ensure y-position check logic is correct (both should be the same comparison)
+        // Only check if ball goes too high or hits the ground
         if (transform.position.y > 1.15f || transform.position.y < -1.15f)
         {
-            Debug.Log("Bird out of bounds. Stopping the game.");
+            Debug.Log("Soccer ball out of bounds. Stopping the game.");
             GameManager.isPlaying = false;
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Debug.Log("Bird collided with an object. Stopping the game.");
-        GameManager.isPlaying = false;
+        // Only end game if colliding with ground
+        if (collision.gameObject.name == "Ground")
+        {
+            Debug.Log("Soccer ball hit the ground. Game over!");
+            GameManager.isPlaying = false;
+        }
+        else
+        {
+            Debug.Log("Soccer ball collided with: " + collision.gameObject.name);
+        }
     }
 }

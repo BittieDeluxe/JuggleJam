@@ -8,11 +8,8 @@ public class GameManager : MonoBehaviour
     public TMP_Text scoreText;
 
     public static bool isPlaying = true;
-    public static float ObsVelocity = 0.2f;
     public static float BGVelocity = 0.01f;
     public static int Score = 0;
-
-    private float timer = 0f; // Timer to keep track of time
 
     private void Start()
     {
@@ -24,21 +21,20 @@ public class GameManager : MonoBehaviour
     {
         if (isPlaying)
         {
-            // Increment timer
-            timer += Time.deltaTime;
+            // No longer using time-based scoring
+            // Score is now incremented by PlayerController when ball is juggled
+        }
+    }
 
-            // Check if one second has passed
-            if (timer >= 1f)
-            {
-                // Increment score by 1 for every second
-                Score++;
-                UpdateScoreText(); // Update score text
-                timer = 0f; // Reset timer
-            }
-
-            // Update velocities
-            ObsVelocity += 0.008f * Time.deltaTime;
-            BGVelocity += 0.0005f * Time.deltaTime;
+    // Static method to increment score for each juggle
+    public static void IncrementScore()
+    {
+        Score++;
+        // Find GameManager instance to update score text
+        GameManager instance = FindObjectOfType<GameManager>();
+        if (instance != null)
+        {
+            instance.UpdateScoreText();
         }
     }
 
